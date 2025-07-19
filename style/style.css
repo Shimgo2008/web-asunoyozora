@@ -1,0 +1,256 @@
+.katex-html{
+    display: none;
+}
+body {
+    margin: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #fff;
+    background-color: #000;
+}
+#glslCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.content-wrapper {
+    position: relative; /* canvasより手前に表示するため */
+    z-index: 1;
+    width: 65%;
+    max-width: 960px;
+    margin: 5vh auto; /* 上下マージンと水平中央揃え */
+    transition: opacity 0.5s ease-in-out;
+}
+.content-wrapper.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.content {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+h2 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.about {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+#toggle-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 24px;
+    color: white;
+}
+/* KaTeX styles */
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css');
+
+/* 入力フィールドのスタイル */
+.input-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-section h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.parameter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.parameter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.parameter-item label {
+    font-size: 0.9em;
+    color: #ccc;
+    font-weight: bold;
+}
+
+.parameter-item input {
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 1em;
+}
+
+.parameter-item input:focus {
+    outline: none;
+    border-color: #4a9eff;
+    box-shadow: 0 0 5px rgba(74, 158, 255, 0.5);
+}
+
+#calculate-button {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #4a9eff, #2d5aa0);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#calculate-button:hover {
+    background: linear-gradient(135deg, #5aaeff, #3d6ab0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+#calculate-button:active {
+    transform: translateY(0);
+}
+
+#simulation-result {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#simulation-result p {
+    margin: 0;
+    text-align: center;
+}
+
+.result-success {
+    color: #4ade80;
+}
+
+.result-error {
+    color: #f87171;
+}
+
+/* パラメータ解説セクションのスタイル */
+.parameter-explanation {
+    margin: 30px 0;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.parameter-explanation h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    text-align: center;
+    color: #4a9eff;
+}
+
+.explanation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.explanation-item {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.explanation-item h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    color: #4ade80;
+    border-bottom: 2px solid rgba(74, 222, 128, 0.3);
+    padding-bottom: 8px;
+}
+
+.explanation-item ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.explanation-item li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+    font-size: 0.95em;
+}
+
+.explanation-item strong {
+    color: #fbbf24;
+}
+
+.physics-note {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(74, 158, 255, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #4a9eff;
+}
+
+.physics-note h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #4a9eff;
+    font-size: 1.2em;
+}
+
+.physics-note p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 0.95em;
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 20px;
+        width: 90%;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    p {
+        font-size: 1em;
+    }
+}

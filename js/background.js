@@ -17,6 +17,7 @@ let program;
 let positionBuffer;
 let timeLocation;
 let resolutionLocation;
+let flagFinish;
 
 function createShader(gl, type, source) {
     const shader = gl.createShader(type);
@@ -58,11 +59,8 @@ function setupQuad(gl) {
 }
 
 function resize() {
-    const height = window.innerHeight;
-    const width = height * 16 / 9;
-
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -82,6 +80,9 @@ async function main() {
     const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
     timeLocation = gl.getUniformLocation(program, 'u_time');
     resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+    flagFinish = gl.getUniformLocation(program, 'is_finish');
+    console.log(timeLocation)
+    console.log(flagFinish)
 
     setupQuad(gl);
 
@@ -104,6 +105,10 @@ function render() {
 
     if (timeLocation) {
         gl.uniform1f(timeLocation, currentTime);
+    }
+
+    if (flagFinish) {
+        gl.uniform1i(flagFinish, isFinish ? 1 : 0);
     }
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);

@@ -3,24 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLSL Canvas</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-        }
-        canvas {
-            display: block;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-    </style>
+    <title>アスノヨゾラ哨戒班 - 自由落下シミュレーション</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="style/style.css">
+    <!-- KaTeX -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <script>let isFinish = false;</script>
 </head>
 <body>
     <canvas id="glslCanvas"></canvas>
-    <script src="main.js"></script>
+    <button id="toggle-button"><span class="material-symbols-outlined">visibility</span></button>
+    <div class="content-wrapper">
+        <div class="content">
+            <h1>アスノヨゾラ哨戒班</h1>
+            <h1>- 自由落下シミュレーション -</h1>
+            <p>
+                ボーカロイド楽曲「アスノヨゾラ哨戒班 feat.IA」のMVにインスパイアされ、楽曲の再生時間（約177秒）で自由落下する場合の初期高度を物理シミュレーションにより算出します。
+            </p>
+            </div>
+            <div class="about">
+                <h2>物理モデルの核心</h2>
+                <p>
+                    空気抵抗を考慮した運動方程式:<br>
+                    $$ a(Z, v) = g - \frac{k(Z)v^2}{m} $$
+                    $$ k(Z) = \frac{1}{2}C_{\mathrm{D}}A\rho(Z) $$<br><br>
+                    この方程式を4次ルンゲ＝クッタ法で数値的に解き、二分法を用いて目標落下時間に到達する初期高度を探索します。
+                </p>
+                <p>
+                    将来的には、WebAssemblyを用いてこのシミュレーションをブラウザ上でリアルタイムに実行する予定です。
+                </p>
+            </div>
+            <div class="parameter-explanation">
+                <h2>パラメータ詳細解説</h2>
+                <div class="explanation-grid">
+                    <div class="explanation-item">
+                        <h3>時間パラメータ</h3>
+                        <ul>
+                            <li><strong>開始時間 t_min (秒)</strong>: シミュレーション開始時刻。通常は0秒から開始します。</li>
+                            <li><strong>終了時間 t_max (秒)</strong>: シミュレーション終了時刻。目標落下時間を設定します（例：177秒）。</li>
+                            <li><strong>ステップ dt (秒)</strong>: 数値積分の時間刻み。小さいほど精度が上がりますが、計算時間が増加します。推奨値：0.01秒。</li>
+                        </ul>
+                    </div>
+                    <div class="explanation-item">
+                        <h3>精度パラメータ</h3>
+                        <ul>
+                            <li><strong>許容誤差 tol (m)</strong>: 二分法による探索の精度。小さいほど正確な結果が得られますが、計算時間が増加します。推奨値：0.000001m。</li>
+                        </ul>
+                    </div>
+                    <div class="explanation-item">
+                        <h3>人体パラメータ</h3>
+                        <ul>
+                            <li><strong>体の厚み h_t (m)</strong>: 人体の前後方向の厚み。空気抵抗計算の断面積に影響します。推奨値：0.1m。</li>
+                            <li><strong>身長 h_h (m)</strong>: 人体の身長。空気抵抗計算の断面積に影響します。推奨値：1.6m程度。</li>
+                            <li><strong>質量 m (kg)</strong>: 落下する物体の質量。推奨値：50-70kg程度。</li>
+                        </ul>
+                    </div>
+                    <div class="explanation-item">
+                        <h3>形状パラメータ</h3>
+                        <ul>
+                            <li><strong>高度幅率 h_width_rate</strong>: 身長に対する体の厚みの比率。人間の体型を表すパラメータで、0.22～0.27の範囲が一般的です。推奨値：0.25。</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="physics-note">
+                    <h3>物理モデルについて</h3>
+                    <p>
+                        本シミュレーションは、U.S. Standard Atmosphere (1976)モデルに基づく空気密度分布と、
+                        人体の形状を長方形に近似した断面積を用いて空気抵抗を計算します。
+                        運動方程式は4次ルンゲ＝クッタ法で数値積分され、二分法により目標落下時間に到達する初期高度を探索します。
+                    </p>
+                </div>
+            </div>
+            <div class="simulation-container">
+                <div class="input-section">
+                    <h3>シミュレーションパラメータ</h3>
+                    <div class="parameter-grid">
+                        <div class="parameter-item">
+                            <label for="t-min">開始時間 t_min (秒):</label>
+                            <input type="number" id="t-min" value="0" step="0.1" min="0">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="t-max">終了時間 t_max (秒):</label>
+                            <input type="number" id="t-max" value="10" step="0.1" min="0">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="dt">ステップ dt (秒):</label>
+                            <input type="number" id="dt" value="0.01" step="0.001" min="0.001">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="tol">許容誤差 tol (m):</label>
+                            <input type="number" id="tol" value="0.000001" step="0.000001" min="0.000001">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="h-t">体の厚み h_t(m):</label>
+                            <input type="number" id="h-t" value="0.1" step="0.1" min="0.1">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="h-h">身長 h_h(m):</label>
+                            <input type="number" id="h-h" value="1.6" step="0.1" min="0.1">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="mass">質量 m (kg):</label>
+                            <input type="number" id="mass" value="60" step="0.1" min="0.1">
+                        </div>
+                        <div class="parameter-item">
+                            <label for="h-width-rate">高度幅率 h_width_rate (0.22~0.27):</label>
+                            <input type="number" id="h-width-rate" value="0.25" step="0.01" min="0.22" max="0.27">
+                        </div>
+                    </div>
+                    <button id="calculate-button">シミュレーション実行</button>
+                </div>
+                <div id="simulation-result">
+                    <p>パラメータを設定して「シミュレーション実行」ボタンを押してください。</p>
+                </div>
+
+                <button id="finish-button">Finish!</button>
+
+                <!-- シミュレーション結果がここに表示されます -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/background.js"></script>
+    <script>
+        // WebAssemblyモジュールを直接読み込む
+        import('./pkg/rust_asunoyozora.js').then(async (module) => {
+            try {
+                await module.default();
+                
+                // シミュレーション実行ボタンのイベントリスナーを追加
+                const calculateButton = document.getElementById('calculate-button');
+                const resultElement = document.getElementById('simulation-result');
+                
+                calculateButton.addEventListener('click', () => {
+                    // 入力フィールドから値を取得
+                    const t_min = parseFloat(document.getElementById('t-min').value);
+                    const t_max = parseFloat(document.getElementById('t-max').value);
+                    const dt = parseFloat(document.getElementById('dt').value);
+                    const tol = parseFloat(document.getElementById('tol').value);
+                    const h_t = parseFloat(document.getElementById('h-t').value);
+                    const h_h = parseFloat(document.getElementById('h-h').value);
+                    const m = parseFloat(document.getElementById('mass').value);
+                    const h_width_rate = parseFloat(document.getElementById('h-width-rate').value);
+                    
+                    // 入力値の検証
+                    if (isNaN(t_min) || isNaN(t_max) || isNaN(dt) || isNaN(tol) || 
+                        isNaN(h_t) || isNaN(h_h) || isNaN(m) || isNaN(h_width_rate)) {
+                        resultElement.innerHTML = '<p class="result-error">エラー: すべてのフィールドに有効な数値を入力してください。</p>';
+                        return;
+                    }
+                    
+                    if (t_min >= t_max) {
+                        resultElement.innerHTML = '<p class="result-error">エラー: 開始時間は終了時間より小さくする必要があります。</p>';
+                        return;
+                    }
+                    
+                    // 計算中の表示
+                    resultElement.innerHTML = '<p>計算中...</p>';
+                    calculateButton.disabled = true;
+                    calculateButton.textContent = '計算中...';
+                    
+                    try {
+                        const result = module.asunoyozora_wasm(t_min, t_max, dt, tol, h_t, h_h, m, h_width_rate);
+                        console.log('WebAssembly calculation result:', result);
+                        
+                        // 結果を表示
+                        resultElement.innerHTML = `
+                            <p class="result-success">計算完了！</p>
+                            <p>結果: ${JSON.stringify(result, null, 2)}</p>
+                        `;
+                    } catch (error) {
+                        console.error('WebAssembly calculation error:', error);
+                        resultElement.innerHTML = `<p class="result-error">計算エラー: ${error.message}</p>`;
+                    } finally {
+                        calculateButton.disabled = false;
+                        calculateButton.textContent = 'シミュレーション実行';
+                    }
+                });
+                
+            } catch (error) {
+                console.error('WebAssembly module error:', error);
+                const resultElement = document.getElementById('simulation-result');
+                if (resultElement) {
+                    resultElement.innerHTML = `<p class="result-error">WebAssemblyモジュールの読み込みエラー: ${error.message}</p>`;
+                }
+            }
+        }).catch(error => {
+            console.error('Failed to load WebAssembly module:', error);
+            const resultElement = document.getElementById('simulation-result');
+            if (resultElement) {
+                resultElement.innerHTML = `<p class="result-error">WebAssemblyモジュールの読み込みに失敗しました: ${error.message}</p>`;
+            }
+        });
+    </script>
+    <script>
+        const toggleButton = document.getElementById('toggle-button');
+        const finishButton = document.getElementById('finish-button');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const toggleIcon = toggleButton.querySelector('.material-symbols-outlined');
+
+        toggleButton.addEventListener('click', () => {
+            contentWrapper.classList.toggle('hidden');
+            if (contentWrapper.classList.contains('hidden')) {
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                toggleIcon.textContent = 'visibility';
+            }
+        });
+
+        finishButton.addEventListener('click', () => {
+            isFinish = true;
+        })
+    </script>
 </body>
 </html>
