@@ -6,6 +6,7 @@
     <title>アスノヨゾラ哨戒班 - 自由落下シミュレーション</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/graph.css">
     <!-- KaTeX -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
@@ -26,8 +27,8 @@
                 <h2>物理モデルの核心</h2>
                 <p>
                     空気抵抗を考慮した運動方程式:<br>
-                    $$ a(Z, v) = g - \frac{k(Z)v^2}{m} $$
-                    $$ k(Z) = \frac{1}{2}C_{\mathrm{D}}A\rho(Z) $$<br><br>
+                    $ a(Z, v) = g - \frac{k(Z)v^2}{m} $
+                    $ k(Z) = \frac{1}{2}C_{\mathrm{D}}A\rho(Z) $<br><br>
                     この方程式を4次ルンゲ＝クッタ法で数値的に解き、二分法を用いて目標落下時間に到達する初期高度を探索します。
                 </p>
                 <p>
@@ -85,7 +86,7 @@
                         </div>
                         <div class="parameter-item">
                             <label for="t-max">終了時間 t_max (秒):</label>
-                            <input type="number" id="t-max" value="10" step="0.1" min="0">
+                            <input type="number" id="t-max" value="177" step="0.1" min="0">
                         </div>
                         <div class="parameter-item">
                             <label for="dt">ステップ dt (秒):</label>
@@ -114,6 +115,11 @@
                     </div>
                     <button id="calculate-button">シミュレーション実行</button>
                 </div>
+                
+                <div id="graph-container" style="display: none;">
+                    <!-- グラフがここに表示されます -->
+                </div>
+
                 <div id="simulation-result">
                     <p>パラメータを設定して「シミュレーション実行」ボタンを押してください。</p>
                 </div>
@@ -126,77 +132,7 @@
     </div>
 
     <script src="js/background.js"></script>
-    <script>
-        // WebAssemblyモジュールを直接読み込む
-        import('./pkg/rust_asunoyozora.js').then(async (module) => {
-            try {
-                await module.default();
-                
-                // シミュレーション実行ボタンのイベントリスナーを追加
-                const calculateButton = document.getElementById('calculate-button');
-                const resultElement = document.getElementById('simulation-result');
-                
-                calculateButton.addEventListener('click', () => {
-                    // 入力フィールドから値を取得
-                    const t_min = parseFloat(document.getElementById('t-min').value);
-                    const t_max = parseFloat(document.getElementById('t-max').value);
-                    const dt = parseFloat(document.getElementById('dt').value);
-                    const tol = parseFloat(document.getElementById('tol').value);
-                    const h_t = parseFloat(document.getElementById('h-t').value);
-                    const h_h = parseFloat(document.getElementById('h-h').value);
-                    const m = parseFloat(document.getElementById('mass').value);
-                    const h_width_rate = parseFloat(document.getElementById('h-width-rate').value);
-                    
-                    // 入力値の検証
-                    if (isNaN(t_min) || isNaN(t_max) || isNaN(dt) || isNaN(tol) || 
-                        isNaN(h_t) || isNaN(h_h) || isNaN(m) || isNaN(h_width_rate)) {
-                        resultElement.innerHTML = '<p class="result-error">エラー: すべてのフィールドに有効な数値を入力してください。</p>';
-                        return;
-                    }
-                    
-                    if (t_min >= t_max) {
-                        resultElement.innerHTML = '<p class="result-error">エラー: 開始時間は終了時間より小さくする必要があります。</p>';
-                        return;
-                    }
-                    
-                    // 計算中の表示
-                    resultElement.innerHTML = '<p>計算中...</p>';
-                    calculateButton.disabled = true;
-                    calculateButton.textContent = '計算中...';
-                    
-                    try {
-                        const result = module.asunoyozora_wasm(t_min, t_max, dt, tol, h_t, h_h, m, h_width_rate);
-                        console.log('WebAssembly calculation result:', result);
-                        
-                        // 結果を表示
-                        resultElement.innerHTML = `
-                            <p class="result-success">計算完了！</p>
-                            <p>結果: ${JSON.stringify(result, null, 2)}</p>
-                        `;
-                    } catch (error) {
-                        console.error('WebAssembly calculation error:', error);
-                        resultElement.innerHTML = `<p class="result-error">計算エラー: ${error.message}</p>`;
-                    } finally {
-                        calculateButton.disabled = false;
-                        calculateButton.textContent = 'シミュレーション実行';
-                    }
-                });
-                
-            } catch (error) {
-                console.error('WebAssembly module error:', error);
-                const resultElement = document.getElementById('simulation-result');
-                if (resultElement) {
-                    resultElement.innerHTML = `<p class="result-error">WebAssemblyモジュールの読み込みエラー: ${error.message}</p>`;
-                }
-            }
-        }).catch(error => {
-            console.error('Failed to load WebAssembly module:', error);
-            const resultElement = document.getElementById('simulation-result');
-            if (resultElement) {
-                resultElement.innerHTML = `<p class="result-error">WebAssemblyモジュールの読み込みに失敗しました: ${error.message}</p>`;
-            }
-        });
-    </script>
+    <script type="module" src="js/calc.js"></script>
     <script>
         const toggleButton = document.getElementById('toggle-button');
         const finishButton = document.getElementById('finish-button');
@@ -213,7 +149,7 @@
         });
 
         finishButton.addEventListener('click', () => {
-            isFinish = true;
+            isFinish = !isFinish;
         })
     </script>
 </body>

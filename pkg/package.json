@@ -5,13 +5,11 @@
   "files": [
     "rust_asunoyozora_bg.wasm",
     "rust_asunoyozora.js",
-    "rust_asunoyozora_bg.js",
     "rust_asunoyozora.d.ts"
   ],
   "main": "rust_asunoyozora.js",
   "types": "rust_asunoyozora.d.ts",
   "sideEffects": [
-    "./rust_asunoyozora.js",
     "./snippets/*"
   ]
 }
