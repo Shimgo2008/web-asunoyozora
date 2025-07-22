@@ -62,7 +62,6 @@ void main() {
     vec2 p = fragCoord.xy / u_resolution.xy;
     vec2 uv = p * vec2(u_resolution.x / u_resolution.y, 1.0);
 
-    // フラグに応じて bottom color を変更
     vec3 localSkyBottomColor = is_finish
         ? vec3(0.9451, 0.5686, 0.3804)
         : vec3(0.004, 0.086, 0.271);
@@ -73,7 +72,6 @@ void main() {
 
     vec3 skyColor = mix(localSkyBottomColor, skyTopColor, p.y * mix_rate);
 
-    // 雲生成（右→左へ流す）
     vec2 q = uv;
     q.x += u_time * speed;
     float cloud = 0.0;

@@ -163,7 +163,7 @@ export class SFGraph {
     animate() {
         if (!this.isAnimating) return;
         
-        const animationDurationMs = 10000;
+        const animationDurationMs = 10000 / 10;
         this.currentFrame = Math.min(this.currentFrame + Math.ceil(this.totalFrames / (animationDurationMs / 16) * this.animationSpeed), this.totalFrames - 1);
         
         this.drawCurrentFrame(this.currentFrame);

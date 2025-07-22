@@ -5,6 +5,7 @@ import mimetypes
 # `.wasm` MIMEを正しく設定
 mimetypes.add_type('application/wasm', '.wasm')
 
+
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         # CORS設定（JSからの読み込みやSharedArrayBuffer用）
@@ -12,6 +13,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
         self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
         super().end_headers()
+
 
 PORT = 8000
 
