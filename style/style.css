@@ -254,3 +254,11 @@ p {
         font-size: 1em;
     }
 }
+
+a {
+    color: #fff;
+}
+
+a:hover{
+    color: #fff;
+}
