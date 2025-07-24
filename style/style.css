@@ -242,15 +242,53 @@ p {
     font-size: 0.95em;
 }
 
+@media (max-width: 960px) {
+    .content-wrapper {
+        width: 85%;
+    }
+}
+
 @media (max-width: 768px) {
+    .content-wrapper {
+        width: 90%;
+        margin: 2vh auto;
+    }
     .content {
         padding: 20px;
-        width: 90%;
     }
-    h1 {
+    h1, h2 {
         font-size: 2em;
     }
     p {
+        font-size: 1em;
+    }
+    .parameter-grid, .explanation-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-wrapper {
+        width: 95%;
+    }
+    .content {
+        padding: 15px;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    h2 {
+        font-size: 1.5em;
+    }
+    p {
+        font-size: 0.9em;
+    }
+    .parameter-item input {
+        padding: 6px 10px;
+        font-size: 0.9em;
+    }
+    #calculate-button, #finish-button {
+        padding: 10px 20px;
         font-size: 1em;
     }
 }
