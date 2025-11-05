@@ -3,7 +3,7 @@ precision mediump float;
 uniform float u_time; // time
 uniform vec2 u_resolution; // resolution
 uniform bool is_finish;
-// bool is_finish = false;
+
 
 
 const float cloudscale = 2.0;

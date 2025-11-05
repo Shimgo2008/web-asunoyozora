@@ -1,7 +1,13 @@
-site:
+# site
+
 https://shimgo2008.github.io/web-asunoyozora/
 
-source:
+# source
 
-wasm from
+### wasm from
+
 https://github.com/Shimgo2008/rust-asunoyozora
+
+### losic from
+
+https://github.com/Shimgo2008/losic-asunoyozora
